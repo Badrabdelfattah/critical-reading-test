@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Critical Reading Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ======================= SETTINGS =======================
+   Paste your Apps Script web-app URL between the quotes in the script below (APPS_SCRIPT_URL). */
+:root{
+  --ink:#1b2430; --muted:#5b6675; --line:#d5dae1; --paper:#ffffff; --bg:#eef1f4;
+  --navy:#1f3a5f; --navy-2:#2c4f7c; --ok:#1e6b45; --ok-bg:#e8f3ec; --warn:#8a5a00; --warn-bg:#fff6e0;
+  --err:#9b2226; --err-bg:#fbeaea; --assist:#f5f7fb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.5}
+.hidden{display:none !important}
+header.bar{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.bar-in{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.crest{width:40px;height:40px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;font-family:"Source Serif 4",serif;font-weight:600;font-size:15px;flex:none}
+.bar-title{flex:1;min-width:200px}
+.bar-title .t1{font-weight:700;font-size:18px;letter-spacing:.2px}
+.bar-title .t2{font-size:13px;opacity:.85}
+.cand{font-size:14px;text-align:right;line-height:1.3}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:4px;min-width:96px;text-align:center}
+.timer.low{background:#b23a3a;border-color:#b23a3a}
+main{max-width:1280px;margin:0 auto;padding:20px 16px 80px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:28px}
+.narrow{max-width:640px;margin:32px auto}
+h1,h2,h3{font-family:"Source Serif 4",serif;font-weight:600;margin:0 0 .5em}
+h1{font-size:28px} h2{font-size:22px} h3{font-size:18px}
+.doc-head{text-align:center;border-bottom:2px solid var(--navy);padding-bottom:14px;margin-bottom:20px}
+.doc-head .inst{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+input[type=text],input[type=password],textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid #aab3bf;border-radius:4px;background:#fff;color:var(--ink)}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid #9cc0ec;outline-offset:1px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--navy);background:var(--navy);color:#fff;padding:10px 20px;border-radius:4px;cursor:pointer}
+.btn:hover{background:var(--navy-2)}
+.btn.sec{background:#fff;color:var(--navy)}
+.btn.sec:hover{background:#f0f4f9}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.err{color:var(--err);background:var(--err-bg);border:1px solid #e3b5b7;padding:10px 12px;border-radius:4px;margin-top:14px}
+.note{font-size:15px;color:var(--muted)}
+.box{border:1px solid var(--line);border-left:4px solid var(--navy);background:var(--assist);padding:14px 16px;border-radius:4px;margin:16px 0}
+ol.instr li{margin-bottom:8px}
+.tbl{border-collapse:collapse;width:100%;font-size:15px;margin:12px 0}
+.tbl td,.tbl th{border:1px solid var(--line);padding:6px 10px;text-align:left}
+.tbl th{background:#f3f5f8}
+/* exam */
+.secnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.secnav button{font:inherit;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 12px;border-radius:4px;cursor:pointer}
+.secnav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.secnav .cnt{font-size:12px;opacity:.8;margin-left:4px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.passage{position:sticky;top:84px;max-height:calc(100vh - 110px);overflow:auto}
+.passage .ptitle{font-family:"Source Serif 4",serif;font-weight:600;font-size:19px;margin:0 0 10px}
+.passage p{font-family:"Source Serif 4",serif;font-size:17.5px;line-height:1.7;margin:0 0 12px}
+.passage .pn{font-family:"Source Sans 3",sans-serif;font-size:12px;color:var(--muted);font-weight:700;margin-right:6px}
+.passage + .passage{margin-top:14px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.marks{font-size:14px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding:20px 0}
+.q:first-of-type{border-top:none}
+.qhead{display:flex;gap:10px}
+.qn{flex:none;font-weight:700;width:32px}
+.qstem{font-weight:600}
+.qmeta{font-size:13px;color:var(--muted)}
+.opts{list-style:none;margin:12px 0 0 42px;padding:0}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:4px;padding:9px 12px;margin-bottom:8px;cursor:pointer;background:#fff}
+.opt:hover{border-color:#8fa3bd}
+.opt input{margin-top:5px}
+.opt .ol{font-weight:700;width:18px;flex:none}
+.opt.sel{border-color:var(--navy);background:#f0f4fa}
+.opt.wrong{background:#f6f6f6;color:#8a8f96;text-decoration:line-through;cursor:not-allowed}
+.opt.right{border-color:var(--ok);background:var(--ok-bg);color:var(--ink);text-decoration:none}
+.opt.locked{cursor:default}
+.qact{margin:10px 0 0 42px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.status{font-size:14px;font-weight:600}
+.status.ok{color:var(--ok)} .status.no{color:var(--err)}
+.assist{margin:12px 0 0 42px;border:1px solid #c9d3e2;border-left:4px solid var(--navy-2);background:var(--assist);padding:12px 14px;border-radius:4px;font-size:16px}
+.assist .ah{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-2);font-weight:700;margin-bottom:4px}
+.assist.model{border-left-color:var(--warn);background:var(--warn-bg)}
+.assist.model .ah{color:var(--warn)}
+.scr{margin:12px 0 0 42px}
+.scr label{font-weight:600;font-size:15px;margin:8px 0 4px}
+.saved{white-space:pre-wrap;background:#f7f8fa;border:1px solid var(--line);border-radius:4px;padding:8px 10px;font-size:15px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.progress{font-size:14px;color:var(--muted)}
+.modal-bg{position:fixed;inset:0;background:rgba(15,25,40,.55);display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:#fff;border-radius:6px;max-width:480px;width:100%;padding:24px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--warn-bg);border:1px solid #e6c46e;color:#5c3d00;padding:10px 16px;border-radius:4px;z-index:40;font-weight:600}
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .passage{position:static;max-height:none}
+  .opts,.qact,.assist,.scr{margin-left:0}
+  .cand{text-align:right;font-size:13px}
+  .card{padding:18px}
+}
+@media (max-width:600px){
+  .bar-in{flex-wrap:nowrap;gap:10px;padding:8px 12px}
+  .crest,.bar-title .t2{display:none}
+  .bar-title{min-width:0}
+  .bar-title .t1{font-size:16px}
+  .timer{font-size:17px;min-width:76px;padding:3px 8px}
+}
+@media print{header.bar,.secnav,.foot{display:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="crest" aria-hidden="true">ASU</div>
+    <div class="bar-title">
+      <div class="t1">Critical Reading Test</div>
+      <div class="t2">Faculty of Education, Ain Shams University · First-Year English Majors</div>
+    </div>
+    <div class="cand hidden" id="candBox"><div id="candName"></div><div id="candVer" style="opacity:.85"></div></div>
+    <div class="timer hidden" id="timer" aria-live="polite">70:00</div>
+  </div>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <section id="scrLogin" class="card narrow">
+    <div class="doc-head">
+      <div class="inst">Faculty of Education · Ain Shams University</div>
+      <h1>Critical Reading Test</h1>
+      <div class="note">31 items · 36 marks · 70 minutes</div>
+    </div>
+    <form id="loginForm" autocomplete="off">
+      <label for="pass">Test passcode</label>
+      <input id="pass" type="password" required>
+      <label for="sname">Full name (as registered)</label>
+      <input id="sname" type="text" required maxlength="80">
+      <p class="note">Enter your name exactly as it appears on the class list. You can sit the test only once.</p>
+      <button class="btn" type="submit" id="loginBtn">Continue</button>
+      <div id="loginErr" class="err hidden" role="alert"></div>
+    </form>
+  </section>
+
+  <!-- INSTRUCTIONS -->
+  <section id="scrInstr" class="card narrow hidden" style="max-width:820px">
+    <div class="doc-head">
+      <div class="inst">Instructions for Test-Takers</div>
+      <h2 id="instrTitle">Critical Reading Test</h2>
+    </div>
+    <ol class="instr" id="instrList"></ol>
+    <table class="tbl" id="weightTbl"><thead><tr><th>Section</th><th>Skill</th><th>Items</th><th>Marks</th></tr></thead><tbody></tbody></table>
+    <div class="box" id="medNote"></div>
+    <p class="note">The timer starts when you press <strong>Begin the test</strong>. When time is up, your answers are submitted automatically. Do not close or refresh this page during the test.</p>
+    <button class="btn" id="beginBtn">Begin the test</button>
+  </section>
+
+  <!-- EXAM -->
+  <section id="scrExam" class="hidden">
+    <nav class="secnav" id="secnav" aria-label="Sections"></nav>
+    <div class="grid">
+      <div class="card passage" id="passageCol"></div>
+      <div class="card" id="qCol"></div>
+    </div>
+    <div class="foot">
+      <button class="btn sec" id="prevBtn">← Previous section</button>
+      <span class="progress" id="progress"></span>
+      <button class="btn sec" id="nextBtn">Next section →</button>
+      <button class="btn hidden" id="submitBtn">Submit test</button>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section id="scrDone" class="card narrow hidden">
+    <div class="doc-head"><div class="inst">Critical Reading Test</div><h2>Test submitted</h2></div>
+    <p id="doneMsg">Your answers have been received. Thank you. You may now close this page.</p>
+  </section>
+
+  <!-- SUBMIT ERROR -->
+  <section id="scrFail" class="card narrow hidden">
+    <h2>Your answers could not be sent</h2>
+    <p>Please check the internet connection and press <strong>Try again</strong>. Do not close this page. Your answers are kept on this computer.</p>
+    <p class="note" id="failDetail"></p>
+    <button class="btn" id="retryBtn">Try again</button>
+    <button class="btn sec" id="dlBtn">Save a copy of my answers</button>
+    <p class="note">If sending keeps failing, save a copy and give the file to your teacher.</p>
+  </section>
+</main>
+
+<div id="modal" class="modal-bg hidden" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3>Submit the test?</h3>
+    <p id="modalText"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn sec" id="modalNo">Return to the test</button>
+      <button class="btn" id="modalYes">Submit now</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+// ============ SETTINGS: paste the Web-app URL from Apps Script here ============
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFwx-jIDYORfrTnIKtBxBO-q3fVF90h1ma3o3z8DHj-ZNj2yA7bmcrkY8m3GqXHDuqhw/exec';
+// ===============================================================================
+
+const $ = s => document.querySelector(s);
+const LETTERS = ['a','b','c','d','e'];
+const STORE = 'crt_state_v1';
+let S = null;          // exam state
+let timerId = null;
+
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE)); }catch(e){ return null; } }
+function clearStore(){ try{ localStorage.removeItem(STORE); }catch(e){} }
+function show(id){ ['scrLogin','scrInstr','scrExam','scrDone','scrFail'].forEach(x=>$('#'+x).classList.toggle('hidden', x!==id)); window.scrollTo(0,0); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, ms=4000){ const t=$('#toast'); t.textContent=msg; t.classList.remove('hidden'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.add('hidden'), ms); }
+
+async function api(payload){
+  const r = await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) }); // text/plain: no CORS preflight
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+async function sha256(s){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+const allItems = () => S.test.sections.flatMap(s=>s.items);
+const itemDone = it => { const a=S.answers[it.n]; return a && a.done; };
+
+// ---------------- LOGIN ----------------
+$('#loginForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const err=$('#loginErr'); err.classList.add('hidden');
+  if(APPS_SCRIPT_URL.startsWith('PASTE')){ err.textContent='This test page has not been connected to the answer sheet yet (APPS_SCRIPT_URL is empty).'; err.classList.remove('hidden'); return; }
+  const btn=$('#loginBtn'); btn.disabled=true; btn.textContent='Checking…';
+  try{
+    const res = await api({action:'start', passcode:$('#pass').value, name:$('#sname').value});
+    if(!res.ok) throw new Error(res.error||'Could not start.');
+    S = { sessionId:res.sessionId, salt:res.salt, name:res.name, version:res.version, minutes:res.minutes,
+          mediation:res.mediation, test:res.test, passcode:$('#pass').value, answers:{}, sec:0,
+          startedAt:null, submitted:false };
+    save(); renderInstr(); show('scrInstr');
+  }catch(ex){ err.textContent = ex.message.startsWith('HTTP')||ex.message==='Failed to fetch' ? 'Could not reach the test server. Check the connection and try again.' : ex.message; err.classList.remove('hidden'); }
+  finally{ btn.disabled=false; btn.textContent='Continue'; }
+});
+
+function setCandidate(){
+  $('#candBox').classList.remove('hidden');
+  $('#candName').textContent = S.name;
+  $('#candVer').textContent = S.version;
+}
+
+function renderInstr(){
+  setCandidate();
+  const t=S.test;
+  $('#instrTitle').textContent = t.title + ' — ' + S.version;
+  $('#instrList').innerHTML = t.instructions.map(x=>'<li>'+esc(x)+'</li>').join('');
+  $('#weightTbl tbody').innerHTML = t.sections.map(s=>`<tr><td>${s.id}</td><td>${esc(s.title.replace(/^Section \d+: /,''))}</td><td>${s.items.length}</td><td>${s.marks}</td></tr>`).join('')
+     + `<tr><th colspan="2">Total</th><th>${t.totalItems}</th><th>${t.totalMarks}</th></tr>`;
+  if(S.mediation){ $('#medNote').innerHTML='<strong>How this test works.</strong> '+esc(t.mediationNote); }
+  else { $('#medNote').innerHTML='<strong>Answering.</strong> Each answer is final once you press <em>Confirm answer</em> or <em>Save answer</em>.'; }
+}
+
+$('#beginBtn').addEventListener('click', ()=>{
+  S.startedAt = Date.now(); save(); startExam();
+});
+
+// ---------------- EXAM ----------------
+function startExam(){
+  setCandidate();
+  $('#timer').classList.remove('hidden');
+  show('scrExam'); renderSection(); tick();
+  timerId = setInterval(tick, 1000);
+  window.addEventListener('beforeunload', beforeUnload);
+}
+function beforeUnload(e){ if(S && !S.submitted){ e.preventDefault(); e.returnValue=''; } }
+
+function remainingMs(){ return S.startedAt + S.minutes*60000 - Date.now(); }
+let warned10=false, warned5=false;
+function tick(){
+  const ms = remainingMs();
+  const t=$('#timer');
+  if(ms<=0){ t.textContent='00:00'; clearInterval(timerId); if(!S.submitted) doSubmit('time'); return; }
+  const m=Math.floor(ms/60000), s=Math.floor(ms%60000/1000);
+  t.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  t.classList.toggle('low', ms < 5*60000);
+  if(ms<10*60000 && !warned10){ warned10=true; toast('10 minutes remaining.'); }
+  if(ms<5*60000 && !warned5){ warned5=true; toast('5 minutes remaining. Unsubmitted answers are sent automatically when time is up.'); }
+}
+
+function renderNav(){
+  $('#secnav').innerHTML = S.test.sections.map((s,i)=>{
+    const done=s.items.filter(itemDone).length;
+    return `<button class="${i===S.sec?'on':''}" data-i="${i}">Section ${s.id}<span class="cnt">${done}/${s.items.length}</span></button>`;
+  }).join('');
+  $('#secnav').querySelectorAll('button').forEach(b=>b.onclick=()=>{ S.sec=+b.dataset.i; save(); renderSection(); });
+  const all=allItems(), d=all.filter(itemDone).length;
+  $('#progress').textContent = `${d} of ${all.length} items answered`;
+  const last = S.sec===S.test.sections.length-1;
+  $('#prevBtn').disabled = S.sec===0;
+  $('#nextBtn').classList.toggle('hidden', last);
+  $('#submitBtn').classList.toggle('hidden', !last);
+}
+$('#prevBtn').onclick=()=>{ if(S.sec>0){ S.sec--; save(); renderSection(); } };
+$('#nextBtn').onclick=()=>{ if(S.sec<S.test.sections.length-1){ S.sec++; save(); renderSection(); } };
+
+function renderSection(){
+  const sec = S.test.sections[S.sec];
+  $('#passageCol').innerHTML = sec.passages.map(p=>`<div class="passage-in"><div class="ptitle">${esc(p.title)}</div>`+
+     p.paragraphs.map((x,i)=>`<p>${p.paragraphs.length>1?`<span class="pn">¶${i+1}</span>`:''}${esc(x)}</p>`).join('')+'</div>').join('<hr style="border:none;border-top:1px solid var(--line);margin:16px 0">');
+  $('#passageCol').scrollTop=0;
+  $('#qCol').innerHTML = `<div class="sechead"><h2>${esc(sec.title)}</h2><span class="marks">${sec.marks} marks</span></div><p class="note">${esc(sec.lead)}</p>` +
+     sec.items.map(it=>`<div class="q" id="q${it.n}"></div>`).join('');
+  sec.items.forEach(renderItem);
+  renderNav(); window.scrollTo(0,0);
+}
+
+function ans(n){ return S.answers[n] || (S.answers[n] = {}); }
+
+function renderItem(it){
+  const box = $('#q'+it.n); if(!box) return;
+  const a = ans(it.n);
+  const head = `<div class="qhead"><span class="qn">${it.n}.</span><div><div class="qstem">${esc(it.stem)}</div>${it.type==='scr'?`<div class="qmeta">(${it.marks} marks)</div>`:''}</div></div>`;
+  if(it.type==='mcq') box.innerHTML = head + mcqHtml(it,a);
+  else box.innerHTML = head + scrHtml(it,a);
+  wireItem(it, box);
+}
+
+function mcqHtml(it,a){
+  const seq=a.seq||[], wrong=new Set(a.wrong||[]);
+  const opts = it.options.map((o,i)=>{
+    const L=LETTERS[i];
+    let cls='opt';
+    if(wrong.has(L)) cls+=' wrong';
+    if(a.done && S.mediation && a.correct===L) cls+=' right';
+    if(a.done) cls+=' locked';
+    if(!a.done && a.pending===L) cls+=' sel';
+    const dis = a.done||wrong.has(L) ? 'disabled' : '';
+    return `<li><label class="${cls}"><input type="radio" name="o${it.n}" value="${L}" ${dis} ${a.pending===L||(a.done&&a.correct===L)?'checked':''}><span class="ol">${L})</span><span>${esc(o)}</span></label></li>`;
+  }).join('');
+  let after='';
+  if(!a.done){
+    after += `<div class="qact"><button class="btn sec" data-act="confirm" ${a.pending?'':'disabled'}>Confirm answer</button>${seq.length?`<span class="status no">Not correct. Read the prompt and choose again.</span>`:''}</div>`;
+  } else {
+    const msg = !S.mediation ? 'Answer recorded.' : a.correct && seq[seq.length-1]===a.correct && !a.revealed ? (seq.length===1?'Answer recorded.':'Correct. Answer recorded.') : 'Item closed.';
+    after += `<div class="qact"><span class="status ${a.revealed||!S.mediation?'':'ok'}">${msg}</span></div>`;
+  }
+  if(S.mediation && it.prompts){
+    const nWrong = (a.wrong||[]).length;
+    if(nWrong>=1) after += `<div class="assist"><div class="ah">Prompt 1</div>${esc(it.prompts[0])}</div>`;
+    if(nWrong>=2) after += `<div class="assist"><div class="ah">Prompt 2</div>${esc(it.prompts[1])}</div>`;
+    if(a.revealed) after += `<div class="assist model"><div class="ah">Worked explanation</div>${esc(it.model)}</div>`;
+  }
+  return `<ul class="opts">${opts}</ul>${after}`;
+}
+
+function scrHtml(it,a){
+  const f = it.fields;
+  if(!a.text1){
+    return `<div class="scr">${f.map((x,i)=>`<label for="t${it.n}_${i}">${esc(x)}</label><textarea id="t${it.n}_${i}" data-f="${i}">${esc((a.draft1||[])[i]||'')}</textarea>`).join('')}
+      <div class="qact" style="margin-left:0"><button class="btn sec" data-act="save1">Save answer</button><span class="note">Your saved answer cannot be changed.</span></div></div>`;
+  }
+  let h = `<div class="scr"><div class="note" style="margin-bottom:4px">Your answer (saved):</div><div class="saved">${f.map((x,i)=>(f.length>1?esc(x)+': ':'')+esc(a.text1[i]||'—')).join('\n')}</div></div>`;
+  if(!S.mediation || !it.reflection) return h + `<div class="qact"><span class="status ok">Answer recorded.</span></div>`;
+  h += `<div class="assist"><div class="ah">Reflection prompt</div>${esc(it.reflection)}</div>`;
+  if(!a.done){
+    h += `<div class="scr">${f.map((x,i)=>`<label for="r${it.n}_${i}">Revised — ${esc(x)} (optional)</label><textarea id="r${it.n}_${i}" data-f="${i}">${esc((a.draft2||[])[i]||'')}</textarea>`).join('')}
+      <div class="qact" style="margin-left:0"><button class="btn sec" data-act="save2">Save revised answer</button><button class="btn sec" data-act="keep">Keep my first answer</button></div></div>`;
+  } else {
+    h += a.text2 ? `<div class="scr"><div class="note" style="margin-bottom:4px">Revised answer (saved):</div><div class="saved">${f.map((x,i)=>(f.length>1?esc(x)+': ':'')+esc(a.text2[i]||'—')).join('\n')}</div></div>` : '';
+    h += `<div class="qact"><span class="status ok">Item completed.</span></div>`;
+  }
+  return h;
+}
+
+function wireItem(it, box){
+  const a=ans(it.n);
+  if(it.type==='mcq'){
+    box.querySelectorAll('input[type=radio]').forEach(r=>r.onchange=()=>{ a.pending=r.value; save(); renderItem(it); });
+    const c=box.querySelector('[data-act=confirm]'); if(c) c.onclick=()=>confirmMcq(it);
+  } else {
+    box.querySelectorAll('textarea').forEach(t=>t.oninput=()=>{
+      const key = t.id.startsWith('t')?'draft1':'draft2';
+      a[key]=a[key]||[]; a[key][+t.dataset.f]=t.value; save();
+    });
+    const b1=box.querySelector('[data-act=save1]'); if(b1) b1.onclick=()=>{
+      const vals=[...box.querySelectorAll('textarea')].map(t=>t.value.trim());
+      if(vals.every(v=>!v)){ toast('Write your answer before saving.'); return; }
+      a.text1=vals; a.t1=Date.now(); if(!S.mediation||!it.reflection) a.done=true; save(); renderItem(it); renderNav();
+    };
+    const b2=box.querySelector('[data-act=save2]'); if(b2) b2.onclick=()=>{
+      const vals=[...box.querySelectorAll('textarea')].map(t=>t.value.trim());
+      if(vals.every(v=>!v)){ toast('Write a revised answer, or choose “Keep my first answer”.'); return; }
+      a.text2=vals; a.t2=Date.now(); a.done=true; save(); renderItem(it); renderNav();
+    };
+    const k=box.querySelector('[data-act=keep]'); if(k) k.onclick=()=>{ a.done=true; a.t2=Date.now(); save(); renderItem(it); renderNav(); };
+  }
+}
+
+async function confirmMcq(it){
+  const a=ans(it.n); const L=a.pending; if(!L) return;
+  a.seq=a.seq||[]; a.wrong=a.wrong||[];
+  if(!a.t0) a.t0=Date.now();
+  a.seq.push(L); delete a.pending;
+  const ok = (await sha256(S.salt+'|'+it.n+'|'+L)) === it.keyHash;
+  if(ok){ a.done=true; a.correct=L; a.t1=Date.now(); }
+  else {
+    a.wrong.push(L);
+    if(!S.mediation){ a.done=true; a.t1=Date.now(); }
+    else if(a.wrong.length>=3){
+      // reveal: find the remaining (correct) option
+      const rest = LETTERS.slice(0,it.options.length).filter(x=>!a.wrong.includes(x));
+      for(const x of rest){ if((await sha256(S.salt+'|'+it.n+'|'+x))===it.keyHash){ a.correct=x; break; } }
+      a.revealed=true; a.done=true; a.t1=Date.now();
+    }
+  }
+  save(); renderItem(it); renderNav();
+  if(!S.mediation && a.done){ /* exam mode: do not show correctness */ }
+}
+
+// ---------------- SUBMIT ----------------
+$('#submitBtn').onclick=()=>{
+  const left = allItems().filter(it=>!itemDone(it)).length;
+  $('#modalText').textContent = left ? `You have ${left} unanswered or unfinished item${left>1?'s':''}. Once you submit, you cannot change any answer.` : 'All items are answered. Once you submit, you cannot change any answer.';
+  $('#modal').classList.remove('hidden');
+};
+$('#modalNo').onclick=()=>$('#modal').classList.add('hidden');
+$('#modalYes').onclick=()=>{ $('#modal').classList.add('hidden'); doSubmit('submitted'); };
+
+function buildPayload(endedBy){
+  const answers={};
+  allItems().forEach(it=>{
+    const a=S.answers[it.n]||{};
+    if(it.type==='mcq') answers[it.n]={ seq:a.seq||[], seconds: a.t0&&a.t1 ? Math.round((a.t1-a.t0)/1000) : 0 };
+    else answers[it.n]={ text1: a.text1 || (a.draft1||[]).map(x=>(x||'').trim()), text2: a.text2||[], seconds: a.t1&&a.t2 ? Math.round((a.t2-a.t1)/1000) : 0 };
+  });
+  return { action:'submit', passcode:S.passcode, sessionId:S.sessionId, name:S.name, startedAt:new Date(S.startedAt).toISOString(), endedBy, answers };
+}
+
+let sending=false;
+async function doSubmit(endedBy){
+  if(sending) return; sending=true;
+  S.endedBy = S.endedBy || endedBy; S.locked=true; save();
+  clearInterval(timerId);
+  const payload = buildPayload(S.endedBy);
+  let lastErr='';
+  for(let i=0;i<3;i++){
+    try{
+      const res = await api(payload);
+      if(res.ok){ S.submitted=true; save(); clearStore(); window.removeEventListener('beforeunload', beforeUnload);
+        $('#timer').classList.add('hidden');
+        $('#doneMsg').textContent = (S.endedBy==='time'?'Time is up. ':'') + 'Your answers have been received. Thank you, ' + S.name + '. You may now close this page.';
+        show('scrDone'); sending=false; return; }
+      lastErr = res.error||'Unknown error';
+      break;
+    }catch(e){ lastErr=e.message; await new Promise(r=>setTimeout(r, 1500*(i+1))); }
+  }
+  sending=false;
+  $('#failDetail').textContent = 'Details: '+lastErr;
+  show('scrFail');
+}
+$('#retryBtn').onclick=()=>doSubmit(S.endedBy||'submitted');
+$('#dlBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(buildPayload(S.endedBy||'submitted'),null,1)],{type:'application/json'});
+  const u=URL.createObjectURL(blob), l=document.createElement('a');
+  l.href=u; l.download='CRT_answers_'+S.name.replace(/\W+/g,'_')+'.json'; l.click(); URL.revokeObjectURL(u);
+};
+
+// ---------------- RESUME after accidental refresh ----------------
+(function resume(){
+  const st = load();
+  if(!st || st.submitted) return;
+  S = st;
+  if(S.locked){ setCandidate(); doSubmit(S.endedBy||'submitted'); return; }
+  if(S.startedAt){ startExam(); toast('Your test has been restored. The timer kept running.'); }
+  else { renderInstr(); show('scrInstr'); }
+})();
+</script>
+</body>
+</html>
