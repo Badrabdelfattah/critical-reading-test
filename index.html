@@ -323,7 +323,7 @@ function ans(n){ return S.answers[n] || (S.answers[n] = {}); }
 function renderItem(it){
   const box = $('#q'+it.n); if(!box) return;
   const a = ans(it.n);
-  const head = `<div class="qhead"><span class="qn">${it.n}.</span><div><div class="qstem">${esc(it.stem)}</div>${it.type==='scr'?`<div class="qmeta">(${it.marks} marks)</div>`:''}</div></div>`;
+  const head = `<div class="qhead"><span class="qn">${allItems().indexOf(it)+1}.</span><div><div class="qstem">${esc(it.stem)}</div>${it.type==='scr'?`<div class="qmeta">(${it.marks} marks)</div>`:''}</div></div>`;
   if(it.type==='mcq') box.innerHTML = head + mcqHtml(it,a);
   else box.innerHTML = head + scrHtml(it,a);
   wireItem(it, box);
